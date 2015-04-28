@@ -12,6 +12,12 @@ module Factory
           end
         end
 
+        fields.each do |field|
+          define_method field do
+            @data[field]
+          end
+        end
+
         def [](key)
           if key.kind_of?(Symbol)
             @data[key]
@@ -25,14 +31,6 @@ module Factory
           end
         end
 
-        def method_missing (meth, *args, &block)
-          field_name = meth.to_sym
-          if @data.include?field_name
-            @data[field_name]
-          else
-            super
-          end
-        end
       end
 
       # Add methods to class
