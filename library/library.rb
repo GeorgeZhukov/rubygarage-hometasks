@@ -3,8 +3,19 @@ module Library
     attr_reader :title, :author
 
     def initialize(title, author)
-      @title = title
-      @author = author
+      self.title = title
+      self.author = author
+    end
+
+    def title=(newTitle)
+      raise ArgumentError, 'Wrong title type' unless newTitle.kind_of?(String)
+      raise ArgumentError, 'Title is required' if newTitle.empty?
+      @title = newTitle
+    end
+
+    def author=(newAuthor)
+      raise ArgumentError, 'Wrong author type' unless newAuthor.kind_of?(Author)
+      @author = newAuthor
     end
 
     def ==(book)
@@ -20,9 +31,19 @@ module Library
     attr_reader :book, :reader, :date
 
     def initialize(book, reader)
-      @book = book
-      @reader = reader
+      self.book = book
+      self.reader = reader
       @date = Time.new
+    end
+
+    def book=(newBook)
+      raise ArgumentError, 'Wrong book type' unless newBook.kind_of?(Book)
+      @book = newBook
+    end
+
+    def reader=(newReader)
+      raise ArgumentError, 'Wrong reader type' unless newReader.kind_of?(Reader)
+      @reader = newReader
     end
 
     def to_s
@@ -34,11 +55,40 @@ module Library
     attr_reader :name, :email, :city, :street, :house
 
     def initialize(name, email, city='', street='', house='')
-      @name = name
-      @email = email
-      @city = city
-      @street = street
-      @house = house
+      self.name = name
+      self.email = email
+      self.city = city
+      self.street = street
+      self.house = house
+    end
+    
+    def name=(newName)
+      raise ArgumentError, 'Wrong name type' unless newName.kind_of?(String)
+      raise ArgumentError, 'Name is required' if newName.empty?
+      @name = newName
+    end
+
+    def email=(newEmail)
+      valid_email_regex = /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+\z/i
+      raise ArgumentError, 'Wrong email type' unless newEmail.kind_of?(String)
+      raise ArgumentError, 'Email is required' if newEmail.empty?
+      raise ArgumentError, 'Wrong email format' unless newEmail =~ valid_email_regex
+      @email = newEmail
+    end
+
+    def city=(newCity)
+      raise ArgumentError, 'Wrong city type' unless newCity.kind_of?(String)
+      @city = newCity
+    end
+
+    def street=(newStreet)
+      raise ArgumentError, 'Wrong street type' unless newStreet.kind_of?(String)
+      @street = newStreet
+    end
+
+    def house=(newHouse)
+      raise ArgumentError, 'Wrong house type' unless newHouse.kind_of?(String)
+      @house = newHouse
     end
 
     def to_s
@@ -50,12 +100,23 @@ module Library
     attr_reader :name, :biography
 
     def initialize(name, biography='')
-      @name = name
-      @biography = biography
+      self.name = name
+      self.biography = biography
+    end
+
+    def name=(newName)
+      raise ArgumentError, 'Wrong name type' unless newName.kind_of?(String)
+      raise ArgumentError, 'Name is required' if newName.empty?
+      @name = newName
+    end
+
+    def biography=(newBiography='')
+      raise ArgumentError, 'Wrong biography type' unless newBiography.kind_of?(String)
+      @biography = newBiography
     end
 
     def to_s
-      @name
+      "#{@name}"
     end
   end
 
@@ -74,17 +135,20 @@ module Library
     end
 
     def add_book (book)
+      raise ArgumentError, 'Wrong book type' unless book.kind_of?(Book)
       @books << book
       @authors << book.author unless @authors.include?(book.author)
     end
 
     def order (book, reader)
+      raise ArgumentError, 'Wrong reader type' unless reader.kind_of?(Reader)
       self.add_book(book) unless @books.include?(book)
       @orders << Order.new(book, reader)
       @readers << reader unless @readers.include?(reader)
     end
 
     def who_often_takes_the_book(book)
+      raise ArgumentError, 'Wrong book type' unless book.kind_of?(Book)
       orders = @orders.select {|order| order.book == book}
       readers = orders.map {|order| order.reader}
       _most_common_value(readers)
@@ -110,11 +174,13 @@ module Library
     end
 
     def save (filename='library.bin')
+      raise ArgumentError, 'String expected' unless filename.kind_of?(String)
       raw = Marshal.dump(self)
       File.write(filename, raw)
     end
 
     def self.load (filename='library.bin')
+      raise ArgumentError, 'String expected' unless filename.kind_of?(String)
       unless File.exist? filename
         puts "File '#{filename}' not found. New library created."
         return Library.new
