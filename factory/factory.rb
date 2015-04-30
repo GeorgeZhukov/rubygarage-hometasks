@@ -1,14 +1,15 @@
 module Factory
   class Factory
-    def Factory.new(*fields, &block)
+    def self.new(*fields, &block)
+      are_symbols = fields.inject(true) {|sum, item| sum &&= item.kind_of?(Symbol)}
+      
+      raise TypeError, 'Symbols expected' unless are_symbols
 
       instance = Class.new do
         define_method :initialize do |*instance_fields|
           @data = {}
           fields.each_with_index do |field, index|
-            if index < instance_fields.length
-              @data[field] = instance_fields[index]
-            end
+            @data[field] = instance_fields[index]
           end
         end
 
