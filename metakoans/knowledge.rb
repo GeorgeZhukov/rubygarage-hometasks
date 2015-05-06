@@ -7,7 +7,7 @@ class Module
       attr_writer name.to_sym
 
       define_method (name + '?') do
-        send(name)? true : false
+        !!send(name)
       end
 
       # Attribute getter
